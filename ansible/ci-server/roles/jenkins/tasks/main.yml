@@ -2,6 +2,12 @@
 - name: Install Java Development Kit
   yum: name={{ jdk }} state=present
 
+- name: Copy the Jenkins repository definition
+  copy: src=jenkins.repo dest=/etc/yum.repos.d/
+
+- name: Create the GPG key for JENKINS
+  copy: src=RPM-GPG-KEY-JENKINS dest=/etc/pki/rpm-gpg
+
 - name: Install Jenkins
   yum: name=jenkins state=present
 
