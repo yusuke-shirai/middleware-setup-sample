@@ -21,7 +21,8 @@ Vagrant.configure("2") do |config|
     c.vm.provider "virtualbox" do |vb|
       vb.memory = "512"
   	end
-    c.vm.synced_folder "../ansible", "/ansible", type: "virtualbox"
+    c.vm.synced_folder "../ansible", "/ansible", type: "rsync",
+      rsync__exclude: ".DS_Store/"
     # install ansible (run once)
     script = <<SCRIPT
 yum -y install epel-release
