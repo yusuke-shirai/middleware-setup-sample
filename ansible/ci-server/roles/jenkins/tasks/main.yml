@@ -1,0 +1,18 @@
+---
+- name: Install Java Development Kit
+  yum: name={{ jdk }} state=present
+
+- name: Install Jenkins
+  yum: name=jenkins state=present
+
+- name: Install Jenkins Plugin
+  jenkins_plugin:
+    name: "{{ item }}"
+    params: "{{ jenkins_params }}"
+  with_items:
+    - "simple-theme-plugin"
+  notify:
+    - restart jenkins
+
+- name: insert firewalld rule for http port
+  firewalld: port=8080/tcp permanent=true state=enabled immediate=yes

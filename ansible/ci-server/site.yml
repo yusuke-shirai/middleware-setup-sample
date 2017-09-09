@@ -1,0 +1,12 @@
+---
+- name: Setup CI Server - Jenkins and plugins
+  hosts: ci
+  user: vagrant
+  # user: root
+  # user: centos
+  # remote_user: root
+  # remote_user: user
+  become: yes
+  roles:
+    - common
+    - jenkins

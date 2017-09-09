@@ -1,0 +1,8 @@
+---
+# Java yum name
+jdk: java-1.8.0-openjdk
+
+# jenkins vars
+jenkins_params:
+  url_username: administrator
+  url_password: jenkins
