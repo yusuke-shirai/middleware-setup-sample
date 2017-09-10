@@ -10,5 +10,6 @@
   roles:
     - common
     - jenkins
+    - git
     - awscli
     - packer
