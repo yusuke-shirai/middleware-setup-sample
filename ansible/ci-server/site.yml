@@ -10,4 +10,5 @@
   roles:
     - common
     - jenkins
+    - awscli
     - packer

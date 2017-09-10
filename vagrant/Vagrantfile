@@ -21,7 +21,7 @@ Vagrant.configure("2") do |config|
     c.vm.provider "virtualbox" do |vb|
       vb.memory = "512"
   	end
-    c.vm.synced_folder "../ansible", "/ansible", type: "rsync",
+    c.vm.synced_folder "..", "/home/vagrant/middleware-setup", type: "rsync",
       rsync__exclude: ".DS_Store/"
     # install ansible (run once)
     script = <<SCRIPT

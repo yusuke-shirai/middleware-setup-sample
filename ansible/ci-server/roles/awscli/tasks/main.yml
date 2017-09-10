@@ -1,0 +1,17 @@
+---
+- name: create temporary directory for pip
+  tempfile:
+    state: directory
+    suffix: build
+  register: tempdir
+
+- name: deploy pip to {{ tempdir.path }}
+  copy: src=get-pip.py dest={{ tempdir.path }}
+
+- name: Install pip
+  command: "python {{ tempdir.path }}/get-pip.py"
+
+- name: Install AWS ClI
+  pip:
+    name: awscli
+    extra_args: --upgrade
