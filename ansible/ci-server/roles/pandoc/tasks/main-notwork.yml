@@ -1,0 +1,66 @@
+---
+- name: Is stack already installed
+  shell: which stack
+  register: which_stack
+  failed_when: which_stack.rc not in [0, 1]
+
+- name: Install wget
+  yum: name=wget state=present
+  become: yes
+  become_user: root
+  when: which_stack.rc == 1
+
+- name: Install Stack
+  shell: "wget -qO- https://get.haskellstack.org/ | sh"
+  when: which_stack.rc == 1
+
+
+- name: Is pandoc already installed
+  shell: which pandoc
+  register: which_pandoc
+  failed_when: which_pandoc.rc not in [0, 1]
+
+- name: create temporary pandoc directory
+  tempfile:
+    state: directory
+    prefix: pandoc.
+  register: pandoc_dir
+  when: which_pandoc.rc == 1
+
+- name: Unarchive Pandoc source to {{ pandoc_dir.path }}
+  unarchive:
+    src: "pandoc-1.19.2.1.tar.gz"
+    dest: "{{ pandoc_dir.path }}"
+  when: which_pandoc.rc == 1
+
+- name: Install unzip
+  yum: name=unzip state=present
+  become: yes
+  become_user: root
+  when: which_pandoc.rc == 1
+
+- name: Unarchive Pandoc source to {{ pandoc_dir.path }}
+  unarchive:
+    src: "pandoc-templates-master.zip"
+    dest: "{{ pandoc_dir.path }}/pandoc-1.19.2.1/data/templates"
+  when: which_pandoc.rc == 1
+
+- name: Stack Setup
+  shell: "stack setup"
+  args:
+    chdir: "{{ pandoc_dir.path }}/pandoc-1.19.2.1"
+  when: which_pandoc.rc == 1
+
+- name: Install zlib
+  yum: name=zlib-devel
+  when: which_pandoc.rc == 1
+
+- name: Make Pandoc
+  shell: "stack install --test"
+  args:
+    chdir: "{{ pandoc_dir.path }}/pandoc-1.19.2.1"
+  when: which_pandoc.rc == 1
+
+- name: copy Pandoc to /user/local/bin
+  copy: src="{{ pandoc_dir.path }}/stack-work/install/x86_64-linux/lts-7.14/8.0.1/bin dest=/usr/local/bin"
+  when: which_pandoc.rc == 1

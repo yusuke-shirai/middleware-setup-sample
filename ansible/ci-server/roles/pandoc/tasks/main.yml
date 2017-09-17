@@ -1,0 +1,63 @@
+---
+- name: Install epel-release and pandoc
+  yum: name={{ item }} state=present
+  become: yes
+  become_user: root
+  with_items:
+    - epel-release
+    - pandoc
+
+- name: Is Tex already installed
+  shell: which tex
+  register: which_tex
+  failed_when: which_tex.rc not in [0, 1]
+
+- name: Install module for install tex
+  yum: name={{ item }} state=present
+  with_items:
+    - perl-Digest-MD5
+    - wget
+    - python-pip
+  become: yes
+  become_user: root
+  when: which_tex.rc == 1
+
+- name: Install python expect for auto answer
+  command: sudo pip install pexpect
+  become: yes
+  become_user: root
+#
+- name: create temporary tex directory
+  tempfile:
+    state: directory
+    prefix: tex.
+  register: tex_temp
+  when: which_tex.rc == 1
+
+- name: Copy Tex Installation ISO
+  copy:
+    src: texlive2017-20170524.iso
+    dest: "{{ tex_temp.path }}"
+  when: which_tex.rc == 1
+
+- name: Mount iso
+  shell: mount -o loop {{ tex_temp.path }}/texlive2017-20170524.iso /mnt/
+  become: yes
+  become_user: root
+  when: which_tex.rc == 1
+
+- name: Install texlive
+  expect:
+    command: "{{ tex_temp.path }}/install-tl-20170916/install-tl"
+    responses:
+      Enter command: I
+      Do you want to continue with the exact same settings as before (y/N): y
+  become: yes
+  become_user: root
+  when: which_tex.rc == 1
+
+- name: Unount iso
+  shell: umount /mnt/
+  become: yes
+  become_user: root
+  when: which_tex.rc == 1

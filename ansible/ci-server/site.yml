@@ -1,14 +1,11 @@
 ---
 - name: Setup CI Server - Jenkins and plugins
-  hosts: ci
-  user: vagrant
-  # user: root
-  # user: centos
-  # remote_user: root
-  # remote_user: user
+  hosts: all
   become: yes
+  become_user: vagrant
   roles:
-    - common
-    - jenkins
-    - awscli
-    - packer
+    # - common
+    # - jenkins
+    # - awscli
+    # - packer
+    - pandoc
