@@ -1,8 +1,6 @@
 {
   "variables": {
     "ami_name": "sample",
-    "access_key": "",
-    "secret_key": ""
   },
   "builders": [
     {

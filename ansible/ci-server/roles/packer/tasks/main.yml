@@ -2,11 +2,5 @@
 - name: Install Unzip
   yum: name=unzip state=present
 
-- name: Create directory for packer
-  file: path=/opt/packer_1.0.4 state=directory
-
 - name: Extract Packer archive
-  unarchive: src=packer_1.0.4_linux_amd64.zip dest=/opt/packer_1.0.4
-
-- name: Symlink install directory
-  file: src=/opt/packer_1.0.4 path=/usr/share/packer state=link
+  unarchive: src=packer_1.0.4_linux_amd64.zip dest=/usr/local/bin
