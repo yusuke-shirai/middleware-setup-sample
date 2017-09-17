@@ -6,6 +6,7 @@
   roles:
     # - common
     # - jenkins
+    # - git
     # - awscli
     # - packer
     - pandoc

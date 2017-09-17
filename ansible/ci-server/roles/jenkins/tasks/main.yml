@@ -2,23 +2,27 @@
 - name: Install Java Development Kit
   yum: name={{ jdk }} state=present
 
-- name: Copy the Jenkins repository definition
-  copy: src=jenkins.repo dest=/etc/yum.repos.d/
+- name: Get Jenkins repository definition
+  get_url: dest=/etc/yum.repos.d/jenkins.repo url=http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo
 
-- name: Create the GPG key for JENKINS
-  copy: src=RPM-GPG-KEY-JENKINS dest=/etc/pki/rpm-gpg
+- name: Import Jenkins repository key
+  shell: rpm --import https://jenkins-ci.org/redhat/jenkins-ci.org.key
 
 - name: Install Jenkins
   yum: name=jenkins state=present
 
-- name: Install Jenkins Plugin
-  jenkins_plugin:
-    name: "{{ item }}"
-    params: "{{ jenkins_params }}"
-  with_items:
-    - "simple-theme-plugin"
-  notify:
-    - restart jenkins
+- name: start jenkins
+  service: name=jenkins state=started enabled=yes
 
 - name: insert firewalld rule for http port
   firewalld: port=8080/tcp permanent=true state=enabled immediate=yes
+
+# 一度、Jenkinsにアクセスして初期セットアップをしてからでないと実行できないのでコメントアウト
+# - name: Install Jenkins Plugin
+#   jenkins_plugin:
+#     name: "{{ item }}"
+#     params: "{{ jenkins_params }}"
+#   with_items:
+#     - "simple-theme-plugin"
+#   notify:
+#     - restart jenkins

@@ -1,6 +1,6 @@
 {
   "variables": {
-    "ami_name": "sample",
+    "ami_name_base": "centos7"
   },
   "builders": [
     {
@@ -12,11 +12,12 @@
       "source_ami": "ami-571e3c30",
       "ssh_username": "centos",
       "instance_type": "t2.micro",
+      "ssh_pty" : true,
       "ssh_timeout": "5m",
       "tags" : {
-        "PackerRole" : "{{user `ami_name`}}-base"
+        "CreatedWith" : "Packer"
       },
-      "ami_name": "{{user `ami_name`}}_{{isotime | clean_ami_name}}"
+      "ami_name": "{{user `ami_name_base`}}_{{isotime | clean_ami_name}}"
     }
   ],
   "provisioners": [
