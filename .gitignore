@@ -1,3 +1,4 @@
 .variables.json
 texlive2017-20170524.iso
 .vagrant/
+/dist/**
