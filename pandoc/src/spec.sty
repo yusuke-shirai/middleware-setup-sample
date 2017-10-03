@@ -1,21 +1,19 @@
-
+%% ページサイズ
 \setlength{\topmargin}{-15.4truemm}%
 \setlength{\headheight}{20truemm}%
-\setlength{\headsep}{10truemm}%
-
+\setlength{\headsep}{5truemm}%
 \setlength{\textheight}{\paperheight}
-\addtolength{\textheight}{-1in}
-\addtolength{\textheight}{-\topmargin}
-\addtolength{\textheight}{-\headheight}
-\addtolength{\textheight}{-\headsep}
-\addtolength{\textheight}{-25.4truemm}
-
+\addtolength{\textheight}{-2in}%デフォルトで上下1inマージンがある
+\addtolength{\textheight}{-\topmargin}%本文より上の領域
+\addtolength{\textheight}{-\headheight}%本文より上の領域
+\addtolength{\textheight}{-\headsep}%本文より上の領域
 \setlength{\textwidth}{\paperwidth}
 \setlength{\oddsidemargin}{-10.4truemm}
 \setlength{\evensidemargin}{-10.4truemm}
 \addtolength{\textwidth}{-15truemm}
 \addtolength{\textwidth}{-15truemm}
 
+%% タイトルページ
 \renewcommand{\maketitle}{%
   \begin{titlepage}%
    \let\footnotesize\small
@@ -55,6 +53,7 @@
   \global\let\and\relax
 }%
 
+%% TPMとかの役職（タイトルページに表示）
 \def\@TPM{\@undefined}
 \def\@GTPM{\@undefined}
 \def\@PTL{\@undefined}
@@ -64,10 +63,12 @@
 \newcommand{\PTL}[1]{\def\@PTL{#1}}%
 \newcommand{\GPM}[1]{\def\@GPM{#1}}%
 
+%% パラグラフの先頭に■が出るので削除
+\def\jsParagraphMark{}
 
+%% ヘッダの開示範囲
 \usepackage{fancyhdr}
 \pagestyle{fancy}
-
 \lhead[\leftmark]{\leftmark}
 \rhead{
 \scriptsize

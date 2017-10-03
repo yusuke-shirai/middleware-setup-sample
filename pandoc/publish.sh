@@ -1,5 +1,5 @@
 #!/bin/sh
-cd src
-pandoc -s test.md -o ../dist/test.pdf  --table-of-contents --toc-depth=3 --number-sections --latex-engine=lualatex  --data-dir=. --template spec
-pandoc -s test.md -o ../dist/test.tex  --table-of-contents --toc-depth=3 --number-sections --latex-engine=lualatex  --data-dir=. --template spec
-# pandoc -s test.md -o ../dist/test.html --table-of-contents --toc-depth=3 --number-sections --self-contained -t html5
+pushd src
+pandoc -s $1.md -o ../dist/$1.pdf  --table-of-contents --toc-depth=3 --number-sections --latex-engine=lualatex  --data-dir=. -V documentclass=ltjsarticle --include-in-header=header.latex
+pandoc -s $1.md -o ../dist/$1.html --table-of-contents --toc-depth=3 --number-sections --self-contained -t html5
+popd

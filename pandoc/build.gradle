@@ -1,0 +1,30 @@
+task pdf(type: Exec) {
+    FileTree tree = fileTree(dir: 'src').include('**/*.md')//.exclude('**/Abstract*')
+    tree.each { File file ->
+        workingDir 'src'
+        executable "pandoc"
+        args "-s", "${file.name.replace('.md', '')}.md",
+          "-o", "../dist/${file.name.replace('.md', '')}.pdf",
+          "--table-of-contents",
+          "--toc-depth=3",
+          "--number-sections",
+          "--latex-engine=lualatex",
+          "-V", "documentclass=ltjsarticle",
+          "-V", "date=\\西暦\\today",
+          "--data-dir=.",
+          "--include-in-header=templates/header.latex"
+    }
+}
+task html(type: Exec) {
+    FileTree tree = fileTree(dir: 'src').include('**/*.md')//.exclude('**/Abstract*')
+    tree.each { File file ->
+        workingDir 'src'
+        executable "pandoc"
+          args "-s", "${file.name.replace('.md', '')}.md",
+            "-o", "../dist/${file.name.replace('.md', '')}.html",
+            "--table-of-contents",
+            "--toc-depth=3",
+            "--number-sections",
+            "--data-dir=."
+    }
+}
