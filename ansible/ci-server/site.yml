@@ -2,12 +2,11 @@
 - name: Setup CI Server - Jenkins and plugins
   hosts: all
   become: yes
-  # become_user: vagrant
   roles:
     # - common
     # - jenkins
-    - gradle
     # - git
+    # - gradle
     # - awscli
     # - packer
-    # - pandoc
+    - pandoc

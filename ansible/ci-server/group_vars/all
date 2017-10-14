@@ -1,9 +1,23 @@
 ---
-# Java yum name
-jdk: java-1.8.0-openjdk
+# Jenkinsに渡すJVMオプション
+jenkins_jvm_option:  "-Xms512m -Xmx1024m"
+# jenkins_jvm_option:  "-Dhttp.proxyHost=proxy.example.com -Dhttp.proxyPort=8080 -Xms256m -Xmx512m"
 
-# jenkins vars
-jenkins_params:
-  url_username: administrator
-  url_password: jenkins
-  
+jenkins_credentials:
+  - id: my-git-credential
+    username: Shirai.Yusuke@gmail.com
+    password: xxx
+
+jenkins_jobs:
+  - id: test1
+    display_name: hogehoge1
+    git_url: https://xxx.example.com/cgr-sample/cgr-infra-sample.git
+    credential_id: my-git-credential
+    gitlab_url: https://xxx.example.com/
+    pileline_file_path: Jenkinsfile/xxx1
+  # - id: test2
+  #   display_name: hogehoge2
+  #   git_url: https://xxx.example.com/cgr-sample/cgr-infra-sample.git
+  #   credential_id: my-git-credential
+  #   gitlab_url: https://xxx.example.com/
+  #   pileline_file_path: Jenkinsfile/xxx2

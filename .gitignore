@@ -4,3 +4,4 @@
 .gradle/
 pandoc/dist/
 texlive2017-20170524.iso
+jenkins-2.73.2-1.1.noarch.rpm

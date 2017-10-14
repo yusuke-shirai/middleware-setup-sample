@@ -1,7 +1,6 @@
 ---
 - name: Install Unzip
   yum: name=unzip state=present
-  become: yes
 
 - name: Make Gradle directory
   file: path=/opt/gradle state=directory owner=root group=root mode=0755
@@ -9,18 +8,5 @@
 - name: Extract Gradle archive
   unarchive: src=gradle-4.2.1-bin.zip dest=/opt/gradle
 
-- name: Symlink install directory
-  file: src=/opt/gradle/gradle-4.2.1 path=/opt/gradle/latest state=link
-
-- name: Make Gradle sh
-  file: path=/etc/profile.d/gradle.sh state=touch owner=root group=root mode=0644
-
-- lineinfile:
-    path: /etc/profile.d/gradle.sh
-    state: present
-    line: 'export GRADLE_HOME=/opt/gradle/latest'
-
-- lineinfile:
-    path: /etc/profile.d/gradle.sh
-    state: present
-    line: 'export PATH=$PATH:$GRADLE_HOME/bin'
+- name: Add gradle symlink to path
+  file: src=/opt/gradle/gradle-4.2.1/bin/gradle dest=/usr/bin/gradle state=link

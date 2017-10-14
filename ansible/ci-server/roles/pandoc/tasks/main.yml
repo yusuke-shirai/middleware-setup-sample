@@ -1,63 +1,67 @@
 ---
 - name: Install epel-release and pandoc
   yum: name={{ item }} state=present
-  become: yes
-  become_user: root
   with_items:
     - epel-release
     - pandoc
 
-- name: Is Tex already installed
+- name: Check if Tex already exists
   shell: which tex
   register: which_tex
   failed_when: which_tex.rc not in [0, 1]
-
-- name: Install module for install tex
+  changed_when: false
+#
+- name: Install module for tex installation
   yum: name={{ item }} state=present
   with_items:
     - perl-Digest-MD5
     - wget
     - python-pip
-  become: yes
-  become_user: root
   when: which_tex.rc == 1
 
 - name: Install python expect for auto answer
-  command: sudo pip install pexpect
-  become: yes
-  become_user: root
-#
-- name: create temporary tex directory
-  tempfile:
-    state: directory
-    prefix: tex.
-  register: tex_temp
-  when: which_tex.rc == 1
+  pip: name=pexpect
 
 - name: Copy Tex Installation ISO
   copy:
     src: texlive2017-20170524.iso
-    dest: "{{ tex_temp.path }}"
+    dest: /tmp/
+    force: no
   when: which_tex.rc == 1
 
 - name: Mount iso
-  shell: mount -o loop {{ tex_temp.path }}/texlive2017-20170524.iso /mnt/
-  become: yes
-  become_user: root
+  shell: mount -o loop /tmp/texlive2017-20170524.iso /mnt/
   when: which_tex.rc == 1
 
-- name: Install texlive
-  expect:
-    command: "{{ tex_temp.path }}/install-tl-20170916/install-tl"
-    responses:
-      Enter command: I
-      Do you want to continue with the exact same settings as before (y/N): y
-  become: yes
-  become_user: root
+- name: confirm
+  pause:
+    prompt: |+
+      TeXをインストールします。
+      別のプロンプトから次のコマンドを実行してください。
+        sudo /mnt/install-tl
+      終了後にEnterキーを押してください。
   when: which_tex.rc == 1
 
+## 経過が表示されず、かつ、失敗することがあるため手動実行としている。
+# - name: Install texlive
+#   expect:
+#     command: "/mnt/install-tl"
+#     responses:
+#       Enter command: I
+#       Do you want to continue with the exact same settings as before (y/N): y
+#   when: which_tex.rc == 1
+#
 - name: Unount iso
   shell: umount /mnt/
-  become: yes
-  become_user: root
   when: which_tex.rc == 1
+
+# FIXME この設定だと、Ansilbeからは読み取れず。TeXがインストールされていない判定になる。
+# FIXME Jenkinsからも実行できるか怪しい。
+- include: add_environment_variable.yml
+  with_items:
+    - env_name: PATH
+      env_value: /usr/local/texlive/2017/bin/x86_64-linux
+    - env_name: MANPATH
+      env_value: /usr/local/texlive/2017/texmf-dist/doc/man
+    - env_name: INFOPATH
+      env_value: /usr/local/texlive/2017/texmf-dist/doc/info

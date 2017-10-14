@@ -1,28 +1,82 @@
 ---
 - name: Install Java Development Kit
-  yum: name={{ jdk }} state=present
-
-- name: Get Jenkins repository definition
-  get_url: dest=/etc/yum.repos.d/jenkins.repo url=http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo
-
-- name: Import Jenkins repository key
-  shell: rpm --import https://jenkins-ci.org/redhat/jenkins-ci.org.key
+  yum: name=java-1.8.0-openjdk-devel state=present
 
 - name: Install Jenkins
-  yum: name=jenkins state=present
+  yum: name=./roles/jenkins/files/jenkins-2.73.2-1.1.noarch.rpm state=present
 
-- name: start jenkins
-  service: name=jenkins state=started enabled=yes
+- name: change login shell of jenkins user
+  user: name=jenkins state=present shell=/bin/bash
 
-- name: insert firewalld rule for http port
+- name: Insert firewalld rule for HTTP port
   firewalld: port=8080/tcp permanent=true state=enabled immediate=yes
 
-# 一度、Jenkinsにアクセスして初期セットアップをしてからでないと実行できないのでコメントアウト
-# - name: Install Jenkins Plugin
-#   jenkins_plugin:
-#     name: "{{ item }}"
-#     params: "{{ jenkins_params }}"
-#   with_items:
-#     - "simple-theme-plugin"
-#   notify:
-#     - restart jenkins
+# Jenkinsの管理 > グローバルセキュリティの設定 > TCP port for JNLP agentsに設定する値
+- name: Insert firewalld rule for JNLP agent port
+  firewalld: port=64292/tcp permanent=true state=enabled immediate=yes
+
+# regexpに合致しないように置換することで毎回changedになることを防止
+- name: Turn off Jenkins setup wizard
+  lineinfile:
+    dest: '/etc/sysconfig/jenkins'
+    regexp: '^JENKINS_JAVA_OPTIONS="-Djava.awt.headless=true"$'
+    line: 'JENKINS_JAVA_OPTIONS="-Djenkins.install.runSetupWizard=false -Djava.awt.headless=true {{ jenkins_jvm_option }}"'
+    state: present
+    backrefs: yes
+  register: register
+
+- name: Restart jenkins for reload settings, if necessary
+  service: name=jenkins state=restarted
+  when: register.changed==True
+
+- name: Wait for Jenkins to start up before proceeding, if necessary
+  shell: "curl -D - --silent --max-time 5 http://localhost:8080/cli/"
+  register: result
+  until: (result.stdout.find("403 Forbidden") != -1) or (result.stdout.find("200 OK") != -1) and (result.stdout.find("Please wait while") == -1)
+  retries: "6"
+  delay: "10"
+  changed_when: false
+  check_mode: no
+  when: register.changed==True
+
+- name: Install Jenkins Plugin
+  jenkins_plugin:
+    name: "{{ item }}"
+    state: present
+    with_dependencies: yes
+    timeout: 120
+  with_items:
+    - "git"
+    - "categorized-view"
+    - "findbugs"
+    - "gradle"
+    - "blueocean"
+    - "blueocean-pipeline-editor"
+    - "ansible"
+    - "build-timeout"
+    - "checkstyle"
+    - "email-ext"
+    - "nexus-artifact-uploader"
+    - "nexus-jenkins-plugin"
+    - "nexus-task-runner"
+    - "timestamper"
+    - "html5-notifier-plugin"
+    - "gitlab-plugin"
+    # - "mapdb-api"
+    # - "github-branch-source"
+    # - "pipeline-github-lib"
+    # - "ws-cleanup"
+    # - "ssh-slaves"
+    # - "build-token-root"
+#   notify: restart jenkins
+
+#TODO テスト
+- include: create_credentials.yml
+  with_items: "{{ jenkins_credentials }}"
+  loop_control:
+    loop_var: jenkins_credential
+
+- include: create_job.yml
+  with_items: "{{ jenkins_jobs }}"
+  loop_control:
+    loop_var: jenkins_job
