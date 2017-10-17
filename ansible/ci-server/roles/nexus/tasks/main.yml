@@ -1,0 +1,39 @@
+##https://blog.tagbangers.co.jp/ja/2016/12/07/install-nexus-repo-oss-3x
+# をみてやり直そう
+
+- name: Install Java Development Kit
+  yum: name=java-1.8.0-openjdk-devel state=present
+
+- name: Add group nexus
+  group: name=nexus
+
+- name: Add user nexus
+  user: name=nexus group=nexus home=/opt/nexus createhome=no
+
+- name: Insert firewalld rule for HTTP port
+  firewalld: port=8081/tcp permanent=true state=enabled immediate=yes
+
+- name: Install Unzip
+  yum: name=unzip state=present
+
+- name: Extract Gradle archive
+  unarchive: src=nexus-3.6.0-02-unix.tar.gz dest=/opt
+
+- name: Add gradle symlink to path
+  file: src=/opt/nexus-3.6.0-02 dest=/opt/nexus state=link group=nexus owner=nexus
+
+- name: Change owner of nexus folder
+  file:
+    path: /opt/nexus-3.6.0-02
+    state: directory
+    recurse: yes
+    group: nexus
+    owner: nexus
+
+- name: Register Nexus as service
+  copy:
+    src: nexus.service
+    dest: /etc/systemd/system/
+
+- name: Start Nexues
+  service: name=nexus state=started enabled=yes daemon_reload=yes

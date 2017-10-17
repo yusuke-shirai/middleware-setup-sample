@@ -1,10 +1,10 @@
 ---
-- name: set timezone
+- name: Set timezone to Asia/Tokyo
   shell: timedatectl set-timezone Asia/Tokyo
   register: set_timezone
   changed_when: false
 
-- name: set loclale
+- name: Set locale to LANG=ja_JP.UTF-8
   shell: localectl set-locale LANG=ja_JP.UTF-8
   register: set_locale
   changed_when: false

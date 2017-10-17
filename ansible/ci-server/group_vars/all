@@ -7,6 +7,20 @@ jenkins_credentials:
   - id: my-git-credential
     username: Shirai.Yusuke@gmail.com
     password: xxx
+    description: Git username and password credentials
+  # - id: my-ssh-credential
+  #   username: Shirai.Yusuke@gmail.com
+  #   password: xxx
+  #   description: Git SSH credentials
+  #   ssh_private_key: |+
+  #     -----BEGIN RSA PRIVATE KEY-----
+  #     xxxxxxxxxxxxxxxxxxxxxx
+  #     -----END RSA PRIVATE KEY-----
+  # - id: my-key-store-file-credential
+  #   password: xxx
+  #   description: Git key store file credentials
+  #   keyStoreFile:
+
 
 jenkins_jobs:
   - id: test1
