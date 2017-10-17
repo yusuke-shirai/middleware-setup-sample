@@ -1,12 +1,12 @@
 ---
-- name: Setup CI Server - Jenkins and plugins
+- name: Setup CI Server - Jenkins and other tools
   hosts: all
   become: yes
   roles:
-    # - common
-    # - jenkins
-    # - git
-    # - gradle
+    - common
+    - git
+    - gradle
+    - jenkins
     - nexus
     # - awscli
     # - packer

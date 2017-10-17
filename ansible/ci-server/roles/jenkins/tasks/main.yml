@@ -19,7 +19,7 @@
 - name: Turn off Jenkins setup wizard
   lineinfile:
     dest: '/etc/sysconfig/jenkins'
-    regexp: '^JENKINS_JAVA_OPTIONS="-Djava.awt.headless=true"$'
+    regexp: '^JENKINS_JAVA_OPTIONS='
     line: 'JENKINS_JAVA_OPTIONS="-Djenkins.install.runSetupWizard=false -Djava.awt.headless=true {{ jenkins_jvm_option }}"'
     state: present
     backrefs: yes
@@ -47,6 +47,7 @@
     timeout: 120
   with_items:
     - "git"
+    - "credentials-plugin"
     - "categorized-view"
     - "findbugs"
     - "gradle"
