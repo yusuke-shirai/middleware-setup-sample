@@ -8,7 +8,7 @@
   group: name=nexus
 
 - name: Add user nexus
-  user: name=nexus group=nexus home=/opt/nexus createhome=no
+  user: name=nexus group=nexus createhome=yes
 
 - name: Insert firewalld rule for HTTP port
   firewalld: port=8081/tcp permanent=true state=enabled immediate=yes
@@ -16,11 +16,8 @@
 - name: Install Unzip
   yum: name=unzip state=present
 
-- name: Extract Gradle archive
+- name: Extract Nexus archive
   unarchive: src=nexus-3.6.0-02-unix.tar.gz dest=/opt
-
-- name: Add gradle symlink to path
-  file: src=/opt/nexus-3.6.0-02 dest=/opt/nexus state=link group=nexus owner=nexus
 
 - name: Change owner of nexus folder
   file:
@@ -30,10 +27,39 @@
     group: nexus
     owner: nexus
 
-- name: Register Nexus as service
-  copy:
-    src: nexus.service
-    dest: /etc/systemd/system/
+- name: Add gradle symlink to path
+  file: src=/opt/nexus-3.6.0-02 dest=/opt/nexus state=link group=nexus owner=nexus
 
-- name: Start Nexues
-  service: name=nexus state=started enabled=yes daemon_reload=yes
+- name: Create data directory for Nexus
+  file: path=/opt/nexus/data state=directory group=nexus owner=nexus
+
+- name: Set data directory
+  lineinfile:
+    dest: /opt/nexus/bin/nexus.vmoptions
+    state: present
+    backrefs: yes
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+  - regexp: '^-Dkaraf\.data=\.\./sonatype-work/nexus3'
+    line: '-Dkaraf.data=/opt/nexus/data'
+  - regexp: '^-Djava\.io\.tmpdir=\.\./sonatype-work/nexus3/tmp'
+    line: '-Djava.io.tmpdir=/opt/nexus/data/tmp'
+  - regexp: '-XX\:LogFile=\.\./sonatype-work/nexus3/log/jvm\.log'
+    line: '-XX:LogFile=/opt/nexus/data/log/jvm.log'
+
+# /home/nexus/.bashrc :
+#
+# NEXUS_HOME="$install-dir"
+#
+#
+# $install-dir/bin/nexus.rc :
+#
+# run_as_user=“nexus"
+# 起動スクリプトの設定
+#
+# $ sudo ln -s $install-dir/bin/nexus /etc/init.d/nexus
+# $ sudo chkconfig --add nexus
+
+# - name: Start Nexues
+#   service: name=nexus state=started enabled=yes daemon_reload=yes
