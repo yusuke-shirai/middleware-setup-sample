@@ -63,7 +63,7 @@
   lineinfile:
     dest: /opt/nexus/bin/nexus.rc
     state: present
-    line: 'run_as_user=“nexus"'
+    line: 'run_as_user="nexus"'
 
 - name: Add gradle symlink to path
   file: src=/opt/nexus/bin/nexus dest=/etc/init.d/nexus state=link

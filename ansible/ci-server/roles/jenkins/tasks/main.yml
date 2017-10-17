@@ -23,11 +23,11 @@
     line: 'JENKINS_JAVA_OPTIONS="-Djenkins.install.runSetupWizard=false -Djava.awt.headless=true {{ jenkins_jvm_option }}"'
     state: present
     backrefs: yes
-  register: register
+  register: change_jvm_opts_result
 
 - name: Restart jenkins for reload settings, if necessary
   service: name=jenkins state=restarted
-  when: register.changed==True
+  when: change_jvm_opts_result.changed==True
 
 - name: Wait for Jenkins to start up before proceeding, if necessary
   shell: "curl -D - --silent --max-time 5 http://localhost:8080/cli/"
@@ -37,7 +37,7 @@
   delay: "10"
   changed_when: false
   check_mode: no
-  when: register.changed==True
+  when: change_jvm_opts_result.changed==True
 
 - name: Install Jenkins Plugin
   jenkins_plugin:
@@ -69,9 +69,22 @@
     # - "ws-cleanup"
     # - "ssh-slaves"
     # - "build-token-root"
-#   notify: restart jenkins
+  register: install_plugin_result
 
-#TODO テスト
+- name: Restart jenkins for reload settings, if necessary
+  service: name=jenkins state=restarted
+  when: install_plugin_result.changed==True
+
+- name: Wait for Jenkins to start up before proceeding, if necessary
+  shell: "curl -D - --silent --max-time 5 http://localhost:8080/cli/"
+  register: result
+  until: (result.stdout.find("403 Forbidden") != -1) or (result.stdout.find("200 OK") != -1) and (result.stdout.find("Please wait while") == -1)
+  retries: "6"
+  delay: "10"
+  changed_when: false
+  check_mode: no
+  when: install_plugin_result.changed==True
+
 - include: create_credentials.yml
   with_items: "{{ jenkins_credentials }}"
   loop_control:
