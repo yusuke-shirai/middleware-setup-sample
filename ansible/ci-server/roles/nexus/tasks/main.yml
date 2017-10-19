@@ -8,10 +8,10 @@
   group: name=nexus
 
 - name: Add user nexus
-  user: name=nexus group=nexus createhome=yes
+  user: name=nexus group=nexus createhome=yes home=/home/nexus
 
-# - name: Insert firewalld rule for HTTP port
-#   firewalld: port=8081/tcp permanent=true state=enabled immediate=yes
+- name: Insert firewalld rule for HTTP port
+  firewalld: port=8081/tcp permanent=true state=enabled immediate=yes
 
 - name: Install Unzip
   yum: name=unzip state=present

@@ -8,7 +8,6 @@
     - gradle
     - jenkins
     - nexus
-    - nginx
     # - awscli
     # - packer
     # - pandoc
