@@ -4,15 +4,9 @@
   become: yes
   roles:
     - common
-<<<<<<< HEAD
-    - jenkins
-    - git
-    - gradle
-=======
     - git
     - gradle
     - jenkins
->>>>>>> eea2d12099b1de6c6e2563aceefbb28879e3de2f
     - nexus
     - nginx
     # - awscli
