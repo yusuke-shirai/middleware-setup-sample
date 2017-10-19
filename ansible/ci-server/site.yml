@@ -3,11 +3,12 @@
   hosts: all
   become: yes
   roles:
-    # - common
-    # - jenkins
-    # - git
-    # - gradle
+    - common
+    - jenkins
+    - git
+    - gradle
     - nexus
+    - nginx
     # - awscli
     # - packer
     # - pandoc

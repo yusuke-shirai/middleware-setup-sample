@@ -8,8 +8,8 @@
 - name: change login shell of jenkins user
   user: name=jenkins state=present shell=/bin/bash
 
-- name: Insert firewalld rule for HTTP port
-  firewalld: port=8080/tcp permanent=true state=enabled immediate=yes
+# - name: Insert firewalld rule for HTTP port
+#   firewalld: port=8080/tcp permanent=true state=enabled immediate=yes
 
 # Jenkinsの管理 > グローバルセキュリティの設定 > TCP port for JNLP agentsに設定する値
 - name: Insert firewalld rule for JNLP agent port
