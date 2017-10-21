@@ -21,6 +21,9 @@ jenkins_credentials:
   #   description: Git key store file credentials
   #   keyStoreFile:
 
+jenkins_admin:
+  username: administrator
+  password: administrator0
 
 jenkins_jobs:
   - id: test1

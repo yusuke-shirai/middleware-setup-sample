@@ -31,5 +31,5 @@
   register: job_import_result
   changed_when: job_import_result.output.find('true') != -1
 
-- debug:
-    msg: "WARNING: Job(ID={{ jenkins_job.id }}) already exists. Skipped import."
+# - debug:
+#     msg: "WARNING: Job(ID={{ jenkins_job.id }}) already exists. Skipped import."
