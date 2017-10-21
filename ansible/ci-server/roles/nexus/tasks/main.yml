@@ -10,6 +10,11 @@
 - name: Add user nexus
   user: name=nexus group=nexus createhome=yes home=/home/nexus
 
+- name: Adjusting file handle limits
+  lineinfile:
+    dest: /etc/security/limits.conf
+    line: "nexus - nofile 65536"
+
 - name: Insert firewalld rule for HTTP port
   firewalld: port=8081/tcp permanent=true state=enabled immediate=yes
 
@@ -69,6 +74,4 @@
   file: src=/opt/nexus/bin/nexus dest=/etc/init.d/nexus state=link
 
 - name: Start Nexsus
-  service: name=nexus state=started enabled=yes daemon_reload=yes
-
-# $ sudo chkconfig --add nexus
+  service: name=nexus state=restarted enabled=yes daemon_reload=yes
