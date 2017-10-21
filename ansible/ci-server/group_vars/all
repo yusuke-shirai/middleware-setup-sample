@@ -25,6 +25,9 @@ jenkins_admin:
   username: administrator
   password: administrator0
 
+jenkins:
+  slave_agent_port: 49600
+
 jenkins_jobs:
   - id: test1
     display_name: hogehoge1

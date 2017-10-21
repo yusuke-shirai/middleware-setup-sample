@@ -1,10 +1,12 @@
-- name: Set Jenkins security
+- name: Set Jenkins global security
   jenkins_script:
     script: |+
       import hudson.security.*
       import jenkins.model.*
 
       def instance = Jenkins.getInstance()
+      instance.setSlaveAgentPort({{ jenkins.slave_agent_port }})
+
       def hudsonRealm = new HudsonPrivateSecurityRealm(false)
       def users = hudsonRealm.getAllUsers()
       users_s = users.collect { it.toString() }
@@ -24,10 +26,10 @@
           hudsonRealm.createAccount(
             '{{ jenkins_admin.username }}',
             '{{ jenkins_admin.password }}')
-          instance.setSecurityRealm(hudsonRealm)
-
-          def strategy = new FullControlOnceLoggedInAuthorizationStrategy()
-          instance.setAuthorizationStrategy(strategy)
-          instance.save()
       }
+      instance.setSecurityRealm(hudsonRealm)
+
+      def strategy = new FullControlOnceLoggedInAuthorizationStrategy()
+      instance.setAuthorizationStrategy(strategy)
+      instance.save()
   register: create_admin_result
