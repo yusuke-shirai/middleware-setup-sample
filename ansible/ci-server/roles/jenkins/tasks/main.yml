@@ -25,7 +25,7 @@
     backrefs: yes
   register: change_jvm_opts_result
 
-- include: restart_jenkins.yml
+- include_tasks: restart_jenkins.yml
   when: change_jvm_opts_result.changed==True
 
 - name: Disable Jenkins security for setup
