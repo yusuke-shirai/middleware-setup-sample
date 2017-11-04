@@ -7,7 +7,7 @@
     - git
     - gradle
     - jenkins
-    - nexus
+    # - nexus
+    # - pandoc
     # - awscli
     # - packer
-    # - pandoc
