@@ -3,7 +3,8 @@
   yum: name=java-1.8.0-openjdk-devel state=present
 
 - name: Install Jenkins
-  yum: name=./roles/jenkins/files/jenkins-2.73.2-1.1.noarch.rpm state=present
+  yum: name=jenkins state=present
+  # yum: name=./roles/jenkins/files/jenkins-2.73.2-1.1.noarch.rpm state=present
 
 - name: change login shell of jenkins user
   user: name=jenkins state=present shell=/bin/bash
