@@ -5,8 +5,8 @@
   roles:
     - common
     - git
-    - java
     - gradle
+    - jenkins-agent
     # - nexus
     # - pandoc
     # - awscli
