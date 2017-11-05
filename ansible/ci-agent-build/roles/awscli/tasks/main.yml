@@ -1,5 +1,0 @@
----
-- name: Install AWS ClI
-  pip:
-    name: awscli
-    extra_args: --upgrade

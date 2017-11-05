@@ -1,0 +1,11 @@
+- name: Restart jenkins
+  service: name=jenkins state=restarted
+
+- name: Wait for Jenkins
+  shell: "curl -D - --silent --max-time 5 http://localhost:8080/cli/"
+  register: result
+  until: (result.stdout.find("403 Forbidden") != -1) or (result.stdout.find("200 OK") != -1) and (result.stdout.find("Please wait while") == -1)
+  retries: "6"
+  delay: "10"
+  changed_when: false
+  check_mode: no

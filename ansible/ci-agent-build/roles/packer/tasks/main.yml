@@ -1,6 +1,0 @@
----
-- name: Install Unzip
-  yum: name=unzip state=present
-
-- name: Extract Packer archive
-  unarchive: src=packer_1.0.4_linux_amd64.zip dest=/usr/local/bin

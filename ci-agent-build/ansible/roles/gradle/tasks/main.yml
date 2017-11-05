@@ -1,0 +1,12 @@
+---
+- name: Install Unzip
+  yum: name=unzip state=present
+
+- name: Make Gradle directory
+  file: path=/opt/gradle state=directory owner=root group=root mode=0755
+
+- name: Extract Gradle archive
+  unarchive: src=gradle-4.3-bin.zip dest=/opt/gradle
+
+- name: Add gradle symlink to path
+  file: src=/opt/gradle/gradle-4.3/bin/gradle dest=/usr/bin/gradle state=link

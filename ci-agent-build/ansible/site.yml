@@ -1,0 +1,13 @@
+---
+- name: Setup CI Build Agent
+  hosts: all
+  become: yes
+  roles:
+    - common
+    - git
+    - java
+    - gradle
+    # - nexus
+    # - pandoc
+    # - awscli
+    # - packer
