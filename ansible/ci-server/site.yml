@@ -7,6 +7,8 @@
     - git
     - gradle
     - jenkins
+    - docker
+    - postgres96
     # - nexus
     # - pandoc
     # - awscli
