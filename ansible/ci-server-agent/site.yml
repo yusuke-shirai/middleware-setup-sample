@@ -1,9 +1,0 @@
----
-- name: Setup CI Server - Jenkins and other tools
-  hosts: all
-  become: yes
-  roles:
-    - common
-    - git
-    - java
-    - gradle

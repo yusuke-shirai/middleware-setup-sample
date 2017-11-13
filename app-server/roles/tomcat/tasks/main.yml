@@ -1,0 +1,48 @@
+---
+- name: Install Java Development Kit
+  yum: name={{ jdk }} state=present
+
+- name: add group "tomcat"
+  group: name=tomcat
+
+- name: add user "tomcat"
+  user: name=tomcat group=tomcat home=/usr/share/tomcat createhome=no
+  become: True
+  become_method: sudo
+
+- name: Download Tomcat
+  get_url: url={{ tomcat_targz_url }} dest=/opt/{{ tomcat_targz }}
+
+- name: Extract archive to /opt/{{ tomcat_targz | regex_replace('\.tar\.gz') }}
+  command: chdir=/usr/share /bin/tar xvf /opt/{{ tomcat_targz }} -C /opt/ creates=/opt/{{ tomcat_targz | regex_replace('\.tar\.gz') }}
+
+- name: Symlink install directory
+  file: src=/opt/{{ tomcat_targz | regex_replace('\.tar\.gz') }} path=/usr/share/tomcat state=link
+
+- name: Change ownership of Tomcat installation #need libselinux-python 
+  file: path=/usr/share/tomcat/ owner=tomcat group=tomcat state=directory recurse=yes
+
+- name: Configure Tomcat server
+  template: src=server.xml dest=/usr/share/tomcat/conf/
+  notify: restart tomcat
+
+- name: Configure Tomcat users
+  template: src=tomcat-users.xml dest=/usr/share/tomcat/conf/
+  notify: restart tomcat
+
+- name: Install Tomcat init script
+  copy: src=tomcat-initscript.sh dest=/etc/init.d/tomcat mode=0755
+
+- name: Start Tomcat
+  service: name=tomcat state=started enabled=yes
+
+# profibit direct tomcat port
+- name: insert firewalld rule for tomcat http port
+  firewalld: port={{ http_port }}/tcp permanent=true state=disabled immediate=yes
+
+# profibit direct tomcat port
+- name: insert firewalld rule for tomcat https port
+  firewalld: port={{ https_port }}/tcp permanent=true state=disabled immediate=yes
+
+- name: wait for tomcat to start
+  wait_for: port={{http_port}}

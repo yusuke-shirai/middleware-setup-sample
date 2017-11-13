@@ -1,0 +1,77 @@
+##https://blog.tagbangers.co.jp/ja/2016/12/07/install-nexus-repo-oss-3x
+# をみてやり直そう
+
+- name: Install Java Development Kit
+  yum: name=java-1.8.0-openjdk-devel state=present
+
+- name: Add group nexus
+  group: name=nexus
+
+- name: Add user nexus
+  user: name=nexus group=nexus createhome=yes home=/home/nexus
+
+- name: Adjusting file handle limits
+  lineinfile:
+    dest: /etc/security/limits.conf
+    line: "nexus - nofile 65536"
+
+- name: Insert firewalld rule for HTTP port
+  firewalld: port=8081/tcp permanent=true state=enabled immediate=yes
+
+- name: Install Unzip
+  yum: name=unzip state=present
+
+- name: Extract Nexus archive
+  unarchive: src=nexus-3.6.0-02-unix.tar.gz dest=/opt
+
+- name: Change owner of nexus folder
+  file:
+    path: /opt/nexus-3.6.0-02
+    state: directory
+    recurse: yes
+    group: nexus
+    owner: nexus
+
+- name: Add gradle symlink to path
+  file:
+    src: /opt/nexus-3.6.0-02
+    dest: /opt/nexus
+    state: link
+    group: nexus
+    owner: nexus
+
+- name: Create data directory for Nexus
+  file: path=/opt/nexus/data state=directory group=nexus owner=nexus
+
+- name: Set data directory
+  lineinfile:
+    dest: /opt/nexus/bin/nexus.vmoptions
+    state: present
+    backrefs: yes
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+  - regexp: '^-Dkaraf\.data=\.\./sonatype-work/nexus3'
+    line: '-Dkaraf.data=/opt/nexus/data'
+  - regexp: '^-Djava\.io\.tmpdir=\.\./sonatype-work/nexus3/tmp'
+    line: '-Djava.io.tmpdir=/opt/nexus/data/tmp'
+  - regexp: '-XX\:LogFile=\.\./sonatype-work/nexus3/log/jvm\.log'
+    line: '-XX:LogFile=/opt/nexus/data/log/jvm.log'
+
+- name: Set data directory
+  lineinfile:
+    dest: /home/nexus/.bashrc
+    state: present
+    line: 'NEXUS_HOME="/opt/nexus"'
+
+- name: Set data directory
+  lineinfile:
+    dest: /opt/nexus/bin/nexus.rc
+    state: present
+    line: 'run_as_user="nexus"'
+
+- name: Add gradle symlink to path
+  file: src=/opt/nexus/bin/nexus dest=/etc/init.d/nexus state=link
+
+- name: Start Nexsus
+  service: name=nexus state=restarted enabled=yes daemon_reload=yes

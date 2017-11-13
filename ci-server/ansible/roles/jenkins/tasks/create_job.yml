@@ -1,0 +1,35 @@
+- name: Create temp directory for job file
+  tempfile:
+    state: directory
+  register: temp_dir
+  become_user: jenkins
+  changed_when: false
+
+- name: Create job file to {{ temp_dir.path }}/job.xml
+  template:
+    src: job.xml
+    dest: "{{ temp_dir.path }}/job.xml"
+  become_user: jenkins
+  changed_when: false
+
+- name: Import Job
+  jenkins_script:
+    script: |+
+      import jenkins.model.*
+
+      def instance  = Jenkins.getInstance()
+
+      def jobName = "{{ jenkins_job.id }}"
+      if (instance.getItem(jobName) == null) {
+        def configXml = new File("{{ temp_dir.path }}/job.xml").text
+        def xmlStream = new ByteArrayInputStream( configXml.getBytes() )
+        instance.createProjectFromXML(jobName, xmlStream)
+        true
+      } else {
+        false
+      }
+  register: job_import_result
+  changed_when: job_import_result.output.find('true') != -1
+
+# - debug:
+#     msg: "WARNING: Job(ID={{ jenkins_job.id }}) already exists. Skipped import."

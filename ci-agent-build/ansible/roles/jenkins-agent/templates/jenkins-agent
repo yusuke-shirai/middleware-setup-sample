@@ -1,0 +1,6 @@
+JENKINS_WORKDIR="/home/jenkins"
+JENKINS_USER="jenkins"
+JENKINS_URL="{{ jenkins.url }}"
+JENKINS_NODENAME="{{ jenkins.nodename }}"
+JENKINS_SECRET="{{ jenkins.secret }}"
+JENKINS_OPTION="-noCertificateCheck"

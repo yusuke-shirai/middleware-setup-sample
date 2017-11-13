@@ -1,0 +1,24 @@
+---
+- name: Install Java Development Kit
+  yum: name=java-1.8.0-openjdk-devel state=present
+
+# mkdir -p /var/lib/jenkins
+# chown -R jenkins:jenkins /var/lib/jenkins
+- name: Add user for jenkins agent
+  user: name=jenkins home=/home/jenkins createhome=yes
+
+- name: Configure Jekins agent
+  template: src=jenkins-agent dest=/etc/sysconfig/ mode=600
+
+# vi /etc/init.d/jenkins-agent
+# chmod 755 /etc/init.d/jenkins-agent
+- name: Install Jenkins agent init script
+  copy: src=jenkins-agent dest=/etc/init.d/ mode=0755
+
+# chkconfig --add jenkins-agent
+# chkconfig jenkins-agent on
+# chkconfig --list jenkins-agent
+
+# service jenkins-agent start
+- name: Start jenkins-agent
+  service: name=jenkins-agent state=started enabled=yes daemon_reload=yes

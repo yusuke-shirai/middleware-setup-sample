@@ -4,6 +4,7 @@
 .gradle/
 .DS_Store
 site.retry
+Vagrantfile
 all
 pandoc/dist/
 texlive2017-20170524.iso

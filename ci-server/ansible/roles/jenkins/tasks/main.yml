@@ -1,0 +1,86 @@
+---
+- name: Install Java Development Kit
+  yum: name=java-1.8.0-openjdk-devel state=present
+
+- name: Install Jenkins
+  yum: name=./roles/jenkins/files/jenkins-2.73.3-1.1.noarch.rpm state=present
+
+- name: change login shell of jenkins user
+  user: name=jenkins state=present shell=/bin/bash
+
+- name: Insert firewalld rule for HTTP port
+  firewalld: port=8080/tcp permanent=true state=enabled immediate=yes
+
+# Jenkinsの管理 > グローバルセキュリティの設定 > TCP port for JNLP agentsに設定する値
+- name: Insert firewalld rule for JNLP agent port
+  firewalld: port=64292/tcp permanent=true state=enabled immediate=yes
+
+# regexpに合致しないように置換することで毎回changedになることを防止
+- name: Turn off Jenkins setup wizard
+  lineinfile:
+    dest: '/etc/sysconfig/jenkins'
+    regexp: '^JENKINS_JAVA_OPTIONS='
+    line: 'JENKINS_JAVA_OPTIONS="-Djenkins.install.runSetupWizard=false -Djava.awt.headless=true {{ jenkins_jvm_option }}"'
+    state: present
+    backrefs: yes
+  register: change_jvm_opts_result
+
+- include_tasks: restart_jenkins.yml
+  when: change_jvm_opts_result.changed==True
+
+- name: Disable Jenkins security for setup
+  jenkins_script:
+    script: |+
+      import jenkins.model.*
+      def instance = Jenkins.getInstance()
+      instance.disableSecurity()
+      instance.save()
+    user: "{{ jenkins_admin.username }}"
+    password: "{{ jenkins_admin.password }}"
+
+- name: Install Jenkins Plugin
+  jenkins_plugin:
+    name: "{{ item }}"
+    state: present
+    with_dependencies: yes
+    timeout: 120
+  with_items:
+    - "git"
+    - "credentials-plugin"
+    - "categorized-view"
+    - "findbugs"
+    - "gradle"
+    - "blueocean"
+    - "blueocean-pipeline-editor"
+    - "ansible"
+    - "build-timeout"
+    - "checkstyle"
+    - "email-ext"
+    - "nexus-artifact-uploader"
+    - "nexus-jenkins-plugin"
+    - "nexus-task-runner"
+    - "timestamper"
+    - "html5-notifier-plugin"
+    - "gitlab-plugin"
+    # - "mapdb-api"
+    # - "github-branch-source"
+    # - "pipeline-github-lib"
+    # - "ws-cleanup"
+    # - "ssh-slaves"
+    # - "build-token-root"
+  register: install_plugin_result
+
+- import_tasks: restart_jenkins.yml
+  when: install_plugin_result.changed==True
+
+- include_tasks: create_credentials.yml
+  with_items: "{{ jenkins_credentials }}"
+  loop_control:
+    loop_var: jenkins_credential
+
+- include_tasks: create_job.yml
+  with_items: "{{ jenkins_jobs }}"
+  loop_control:
+    loop_var: jenkins_job
+
+- import_tasks: set_security.yml
