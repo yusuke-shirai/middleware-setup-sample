@@ -1,0 +1,97 @@
+allprojects {
+  apply plugin: 'maven'
+  group = 'jp.co.xxx'
+  version = '1.0.0-SNAPSHOT'
+  repositories {
+    mavenCentral() // or jcenter()
+    //準備中 maven { url "http://xxx"}
+  }
+}
+
+subprojects {
+  apply plugin: 'java'
+  apply plugin: 'jacoco'
+  apply plugin: 'checkstyle'
+  apply plugin: 'findbugs'
+
+  sourceCompatibility = 1.8
+  targetCompatibility = 1.8
+  tasksWithType(JavaCompile) {
+    options.encoding = 'UTF-8'
+  }
+
+  checkstyle {
+    ignoreFailure = true
+    toolVersion =
+    sourceSets = [sourceSets.main] // 他にもあれば追加。
+    configFile = file("$rootDir/daitochecker.xml")
+    reportsDir = file("$reportsDir/checkstyle/")
+  }
+
+  findbugs {
+    ignoreFailure = true
+    toolVersion =
+    sourceSets = [sourceSets.main] // 他にもあれば追加。
+    reportsDir = file("$reportsDir/findbugs/")
+    effort = "default" //min|max
+    reportLevel = "midium" //low|high
+  }
+
+  test {
+    reports.html.destination = file("$reportsDir/test/html/")
+    reports.xml.destination = file("$reportsDir/test/xml/")
+
+    jacoco {
+      append = false
+      destinationFile = file("$reportsDir/jacoco/jacoco.exec")
+    }
+  }
+
+  jacoco {
+    toolVersion = "0.7.5.+"
+    reportsDir = file("$reportsDir/jacoco/")
+  }
+
+  jacocoTestReport {
+    reports {
+        csv.enabled true
+        html.enabled true
+        xml.enabled false
+    }
+  }
+}
+
+
+public interface SlowTests {
+}
+
+@Category(SlowTests.class)
+public class BarTest {
+    @Test
+    public void test01() throws Exception {
+        System.out.println("BarTest#test01");
+    }
+
+    @Test
+    public void test02() throws Exception {
+        System.out.println("BarTest#test02");
+    }
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+
+task fastTest(type: Test, dependsOn: testClasses) {
+    useJUnit {
+        excludeCategories 'sample.categories.SlowTests'
+    }
+}
+
+task seleniumTest(type: Test, dependsOn: testClasses) {
+  // testClassesDirs = project.sourceSets.selenium.output.classesDir
+  // reports.html.destination = file("$reportsDir/seleniumTest/html/")
+  // reports.xml.destination = file("$reportsDir/seleniumTest/xml/")
+
+  //...
+}
