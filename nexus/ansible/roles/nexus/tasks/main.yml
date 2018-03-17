@@ -22,11 +22,11 @@
   yum: name=unzip state=present
 
 - name: Extract Nexus archive
-  unarchive: src=nexus-3.6.0-02-unix.tar.gz dest=/opt
+  unarchive: src=nexus-3.9.0-01-unix.tar.gz dest=/opt
 
 - name: Change owner of nexus folder
   file:
-    path: /opt/nexus-3.6.0-02
+    path: /opt/nexus-3.9.0-01
     state: directory
     recurse: yes
     group: nexus
@@ -34,7 +34,7 @@
 
 - name: Add gradle symlink to path
   file:
-    src: /opt/nexus-3.6.0-02
+    src: /opt/nexus-3.9.0-01
     dest: /opt/nexus
     state: link
     group: nexus
