@@ -7,8 +7,8 @@ site.retry
 Vagrantfile
 all
 pandoc/dist/
-texlive2017-20170524.iso
-jenkins-2.73.2-1.1.noarch.rpm
-jenkins-2.73.3-1.1.noarch.rpm
-nexus-3.6.0-02-unix.tar.gz
-gradle-4.2.1-bin.zip
+texlive*.iso
+jenkins-*.rpm
+nexus-*.tar.gz
+gradle-*.zip
+build
