@@ -1,0 +1,27 @@
+apply plugin: 'java'
+
+version = "1.0-SNAPSHOT"
+
+
+repositories {
+    flatDir {
+        name "fileRepo"
+        dirs 'repo'
+    }
+}
+
+task dist(type: Tar) {
+    classifier = 'exec'
+    from 'src/main/files'
+    compression Compression.GZIP
+}
+
+artifacts {
+    archives dist
+}
+
+uploadArchives {
+    repositories {
+        add project.repositories.fileRepo
+    }
+}
