@@ -3,13 +3,12 @@
   hosts: all
   become: yes
   roles:
-    - common
-    - git
+    # - common
+    # - git
     - gradle
-    - jenkins-agent
-    - docker
-    - postgres96
-    # - nexus
+    # - jenkins-agent
+    # - docker
+    # - postgres96
     # - pandoc
     # - awscli
     # - packer
